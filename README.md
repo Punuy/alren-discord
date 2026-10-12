@@ -4,17 +4,16 @@ Alren is a Discord bot for private AI chat, osu! account verification, random be
 
 ## Community-alert quick start
 
-Use this after the bot has its `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and Discord token configured:
+Use this after the bot has its Discord token configured:
 
-1. In Supabase **SQL Editor**, run [`supabase/community_alert_settings.sql`](supabase/community_alert_settings.sql).
-2. Restart Alren with `npm start` (or redeploy it on Railway). The bot registers `/setup` when it connects.
-3. In Discord, a member with **Manage Server** runs:
+1. Start Alren with `npm start` (or deploy it on Railway). The bot creates the SQLite database automatically and registers `/setup` when it connects.
+2. In Discord, a member with **Manage Server** runs:
 
    ```text
    /setup alerts channel:#alerts bn_mode:Standard (osu!)
    ```
 
-4. Confirm the saved configuration privately with `/setup status`.
+3. Confirm the saved configuration privately with `/setup status`.
 
 Alren records the current public state at startup and only posts later BN openings or newly opened Mappers' Guild missions. There is no `COMMUNITY_ALERT_CHANNEL_ID` environment variable: the channel and BN mode are stored per Discord server.
 
@@ -27,7 +26,7 @@ Alren records the current public state at startup and only posts later BN openin
 - A Discord account
 - An API key from OpenAI or OpenRouter for AI chat
 - An osu! OAuth application for account verification and beatmap searches
-- A Supabase project for verification records and beatmap feed settings
+- SQLite (handled automatically; no separate database server needed)
 
 Check Node.js:
 
@@ -102,16 +101,17 @@ VERIFY_PORT=3000
 
 `OSU_CLIENT_ID` and `OSU_CLIENT_SECRET` are used for both account verification and beatmap searches. `OSU_REDIRECT_URI` is used by the account-verification callback and must exactly match the URL registered with osu!.
 
-### 6. Configure Supabase
+### 6. Configure SQLite database
 
-1. In Supabase, open **SQL Editor** and apply your project schema. The bot expects the `osu_verifications`, `osu_verification_settings`, `osu_verification_requests`, `osu_map_settings`, `osu_map_posts`, and `community_alert_settings` tables. For verification result channels, also run [`supabase/verification_settings.sql`](supabase/verification_settings.sql).
-2. Copy the project URL and a server-only secret key from **Project Settings → API Keys**.
-3. Add them to `.env` or Railway Variables:
+By default, Alren creates and maintains an SQLite database automatically at `./data/alren.sqlite`. No manual SQL migrations or external accounts are required.
+
+To customize the database location, set `SQLITE_PATH` in `.env`:
 
 ```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SECRET_KEY=your-server-only-supabase-secret
+SQLITE_PATH=./data/alren.sqlite
 ```
+
+For persistent Railway deployments, add a Railway volume mounted to `/app/data` (or your chosen path).
 
 ### 7. Deploy on Railway
 
