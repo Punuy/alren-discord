@@ -157,9 +157,3 @@ npm run test:community
 npm run preview:osumap
 npm run preview:community
 ```
-
----
-
-## License
-
-[ISC](LICENSE)
